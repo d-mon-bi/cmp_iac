@@ -297,7 +297,7 @@
       "Type" : "AWS::AutoScaling::ScalingPolicy",
       "Properties" : {
         "AdjustmentType" : "ChangeInCapacity",
-        "AutoScalingGroupName" : { "Ref" : "WeServerGrou" },
+        "AutoScalingGroupName" : { "Ref" : "WebServerGroup" },
         "Cooldown" : "60",
         "ScalingAdjustment" : "1"
       }
