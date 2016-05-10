@@ -229,13 +229,33 @@
             "packages" : {
               "yum" : {
                 "nodejs"   : [],
-                "npm"      : []
+                "npm"      : [],
+                "git"      : []
               }
             },
 
                 "group"   : "root"
           },
           "files" : {
+              "/etc/systemd/system/cmpapi.service" : {
+                "content" : { "Fn::Join" : ["", [
+                  "[Unit]\n",
+                  "Description=CMP API\n",
+                  "[Service]\n",
+                  "ExecStart=/var/api/cmp/server.js\n",
+                  "Restart=always\n",
+                  "User=nobody\n",
+                  "Group=nobody\n",
+                  "Environment=PATH=/usr/bin:/usr/local/bin\n",
+                  "Environment=NODE_ENV=production\n",
+                  "WorkingDirectory=/var/api/cmp\n",
+                  "[Install]\n",
+                  "WantedBy=multi-user.target\n"
+                ]]},
+                "mode"     : "000400",
+                "owner"    : "root",
+                "group"    : "root"
+              },
               "/etc/cfn/cfn-hup.conf" : {
                 "content" : { "Fn::Join" : ["", [
                   "[main]\n",
@@ -246,7 +266,7 @@
                 "owner"   : "root",
                 "group"   : "root"
               },
-
+              
               "/etc/cfn/hooks.d/cfn-auto-reloader.conf" : {
                 "content": { "Fn::Join" : ["", [
                   "[cfn-auto-reloader-hook]\n",
@@ -288,7 +308,11 @@
              "/opt/aws/bin/cfn-signal -e $? ",
              "         --stack ", { "Ref" : "AWS::StackName" },
              "         --resource WebServerGroup ",
-             "         --region ", { "Ref" : "AWS::Region" }, "\n"
+             "         --region ", { "Ref" : "AWS::Region" }, "\n",
+             "mkdir /var/api", "\n",
+             "mkdir /var/api/cmp" , "\n",
+             "git clone https://github.com/d-mon-bi/cmp_api /var/api/cmp" , "\n",
+             "systemctl start cmpapi", "\n"
         ]]}}
       }
     },
@@ -364,7 +388,7 @@
           "Protocol" : "TCP"
         } ],
         "HealthCheck" : {
-          "Target" : "TCP:3000/",
+          "Target" : "TCP:3000",
           "HealthyThreshold" : "3",
           "UnhealthyThreshold" : "5",
           "Interval" : "30",
